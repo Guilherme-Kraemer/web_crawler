@@ -85,7 +85,7 @@ def run(playwright: Playwright):
     # Salvar resultados
     if medications:
         df = pd.DataFrame(medications)
-        df.to_csv("medicamentos_alternative.csv", index=False, encoding='utf-8')
+        df.to_csv("medicamentos.csv", index=False, encoding='utf-8')
         print(f"\nResumo:")
         print(f"Total de medicamentos: {len(medications)}")
         print(f"Por letra: {df.groupby('letter').size().to_dict()}")

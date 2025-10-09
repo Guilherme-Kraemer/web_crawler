@@ -1,3 +1,6 @@
 /home
 .vscode
 __pycache__
+medications_by_letter
+medicamentos_alternative.csv
+medications_details_complete.csv
