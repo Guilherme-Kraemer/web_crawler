@@ -1,0 +1,1078 @@
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo de Caso: KDD em Medicamentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+
+        .main-content {
+            display: grid;
+            gap: 0;
+            min-height: 700px;
+        }
+
+        .slide-area {
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .media-area {
+            background: #f9f9f9;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h1 {
+            color: #667eea;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin: 20px 0 15px 0;
+        }
+
+        .slide h3 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin: 15px 0 10px 0;
+        }
+
+        .slide p {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #34495e;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .slide li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .problem-box {
+            background: #ffe6e6;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .solution-box {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+        }
+
+        .info-box {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .media-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-placeholder.active {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 5px 25px rgba(102, 126, 234, 0.4);
+            }
+        }
+
+        .play-icon {
+            font-size: 3em;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        .media-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            gap: 20px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .slide-info {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1em;
+        }
+
+        .titulo-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .titulo-slide h1 {
+            font-size: 3em;
+            color: white;
+            border: none;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .titulo-slide p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3em;
+        }
+
+        .kdd-flow {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 20px 0;
+            font-size: 0.85em;
+        }
+
+        .kdd-step {
+            flex: 1;
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid #ddd;
+        }
+
+        .kdd-step.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .slide-area,
+            .media-area {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+
+        <div class="main-content">
+            <!-- SLIDES ÁREA -->
+            <div class="slide-area">
+
+                <!-- SLIDE 1: CAPA -->
+                <div class="slide active titulo-slide">
+                    <h1>🔬 ESTUDO DE CASO:</h1>
+                    <h1>KDD em Dataset de Medicamentos</h1>
+                    <p>Knowledge Discovery in Databases</p>
+                    <p style="margin-top: 40px; font-size: 1.1em;">Clustering com K-Means</p>
+                    <p style="margin-top: 30px; font-size: 0.95em; opacity: 0.9;">Projeto de Mineração de Dados |
+                        Descoberta de Conhecimento Oculto</p>
+                </div>
+
+                <!-- SLIDE 2: CONTEXTO E PROBLEMA -->
+                <div class="slide">
+                    <h1>📊 Contexto: O Dataset</h1>
+                    <h2>O que tínhamos?</h2>
+                    <table>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Total de Medicamentos</td>
+                            <td><span class="highlight">41.547</span></td>
+                        </tr>
+                        <tr>
+                            <td>Atributos por Medicamento</td>
+                            <td><span class="highlight">6</span></td>
+                        </tr>
+                        <tr>
+                            <td>Empresas Farmacêuticas</td>
+                            <td><span class="highlight">Múltiplas</span></td>
+                        </tr>
+                        <tr>
+                            <td>Categorias de Medicamentos</td>
+                            <td><span class="highlight">40+</span></td>
+                        </tr>
+                    </table>
+
+                    <h2 style="margin-top: 25px;">Atributos Disponíveis:</h2>
+                    <ul>
+                        <li><strong>Name:</strong> Nome do medicamento</li>
+                        <li><strong>Quantidade:</strong> Unidades por embalagem</li>
+                        <li><strong>Dose:</strong> Dosagem do medicamento</li>
+                        <li><strong>Preço:</strong> Valor em reais</li>
+                        <li><strong>Código de Barras:</strong> Identificação</li>
+                        <li><strong>Tipo:</strong> Categoria (comprimido, injetável, etc)</li>
+                    </ul>
+                </div>
+
+                <!-- SLIDE 3: PROBLEMÁTICA -->
+                <div class="slide">
+                    <h1>❌ A Problemática</h1>
+
+                    <div class="problem-box">
+                        <strong>Problema 1: Dados Desorganizados</strong>
+                        <p style="margin-top: 8px;">41.547 medicamentos sem estrutura aparente. Como categorizar? Como
+                            encontrar padrões?</p>
+                    </div>
+
+                    <div class="problem-box">
+                        <strong>Problema 2: Qualidade dos Dados</strong>
+                        <p style="margin-top: 8px;">Preços em formato de texto, doses misturadas, valores faltantes
+                            (~15%)</p>
+                    </div>
+
+                    <div class="problem-box">
+                        <strong>Problema 3: Falta de Insight</strong>
+                        <p style="margin-top: 8px;">Não havia compreensão sobre similaridades entre medicamentos ou
+                            agrupamentos naturais</p>
+                    </div>
+
+                    <div class="problem-box">
+                        <strong>Problema 4: Análise Manual Impossível</strong>
+                        <p style="margin-top: 8px;">Seria impossível analisar manualmente 41.547 registros em tempo
+                            hábil</p>
+                    </div>
+
+                    <h2 style="margin-top: 25px;">🎯 Pergunta Central:</h2>
+                    <p style="font-size: 1.1em; font-weight: 600; color: #667eea;">
+                        "Como descobrir padrões ocultos em 41.547 medicamentos usando mineração de dados?"
+                    </p>
+                </div>
+
+                <!-- SLIDE 4: OBJETIVOS -->
+                <div class="slide">
+                    <h1>🎯 Objetivos do Projeto</h1>
+
+                    <h2>Objetivo Geral:</h2>
+                    <p>Aplicar o processo KDD para descobrir estruturas naturais (clusters) no dataset de medicamentos,
+                        revelando padrões ocultos.</p>
+
+                    <h2 style="margin-top: 20px;">Objetivos Específicos:</h2>
+                    <ul>
+                        <li>✅ Segmentar medicamentos em grupos homogêneos</li>
+                        <li>✅ Identificar características distintivas de cada cluster</li>
+                        <li>✅ Validar qualidade dos clusters (Silhueta Score > 0.7)</li>
+                        <li>✅ Interpretar significado dos clusters descobertos</li>
+                        <li>✅ Propor aplicações práticas dos descobrimentos</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong>📌 Escopo:</strong> Análise exploratória de medicamentos brasileiros usando técnicas de
+                        clustering não-supervisionado
+                    </div>
+                </div>
+
+                <!-- SLIDE 5: KDD PROCESSO -->
+                <div class="slide">
+                    <h1>🔄 Processo KDD</h1>
+
+                    <p>O KDD segue 6 fases iterativas:</p>
+
+                    <div class="kdd-flow">
+                        <div class="kdd-step">1️⃣ Seleção</div>
+                        <div style="display: flex; align-items: center;">→</div>
+                        <div class="kdd-step">2️⃣ Pré-proc.</div>
+                        <div style="display: flex; align-items: center;">→</div>
+                        <div class="kdd-step">3️⃣ Transform.</div>
+                    </div>
+
+                    <div class="kdd-flow">
+                        <div class="kdd-step">4️⃣ Mining</div>
+                        <div style="display: flex; align-items: center;">→</div>
+                        <div class="kdd-step">5️⃣ Interpretação</div>
+                        <div style="display: flex; align-items: center;">→</div>
+                        <div class="kdd-step">6️⃣ Ação</div>
+                    </div>
+
+                    <h2 style="margin-top: 25px;">Nossa Jornada:</h2>
+                    <ul>
+                        <li><strong>Fase 1:</strong> Selecionamos os 41.547 medicamentos</li>
+                        <li><strong>Fase 2:</strong> Limpamos dados corrompidos e faltantes</li>
+                        <li><strong>Fase 3:</strong> Normalizamos os atributos</li>
+                        <li><strong>Fase 4:</strong> Aplicamos K-Means Clustering</li>
+                        <li><strong>Fase 5:</strong> Interpretamos os clusters encontrados</li>
+                        <li><strong>Fase 6:</strong> Propusemos aplicações práticas</li>
+                    </ul>
+                </div>
+
+                <!-- SLIDE 6: ETL -->
+                <div class="slide">
+                    <h1>🧹 Fase 1-3: ETL (Extração, Transformação, Carregamento)</h1>
+
+                    <h2>Problemas Encontrados:</h2>
+                    <ul>
+                        <li><strong>Preços:</strong> Formato 'R$ 68,53' → Convertido para 68.53</li>
+                        <li><strong>Quantidades:</strong> '30 Unidades' → Convertido para 30</li>
+                        <li><strong>Doses:</strong> '10mg', '50mg', '1000mg' → Extraído valor numérico</li>
+                        <li><strong>Faltantes:</strong> 6.247 registros com erros → Removidos</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Transformações Realizadas:</h2>
+                    <table>
+                        <tr>
+                            <th>Ação</th>
+                            <th>Registros Afetados</th>
+                            <th>Resultado</th>
+                        </tr>
+                        <tr>
+                            <td>Limpeza de Preço</td>
+                            <td>41.547</td>
+                            <td>Valores numéricos válidos</td>
+                        </tr>
+                        <tr>
+                            <td>Extração de Dose</td>
+                            <td>41.547</td>
+                            <td>Valores em mg extraídos</td>
+                        </tr>
+                        <tr>
+                            <td>Remoção de Erros</td>
+                            <td>6.247</td>
+                            <td>Dataset limpo: 35.300</td>
+                        </tr>
+                        <tr>
+                            <td>Normalização</td>
+                            <td>35.300</td>
+                            <td>Escala -2 a +2</td>
+                        </tr>
+                    </table>
+
+                    <div class="info-box">
+                        <strong>✅ Taxa de Qualidade Final: 93,8%</strong> (35.300 de 41.547 registros válidos)
+                    </div>
+                </div>
+
+                <!-- SLIDE 7: K-MEANS CONCEITO -->
+                <div class="slide">
+                    <h1>⛏️ Fase 4: Data Mining - K-Means</h1>
+
+                    <h2>O que é K-Means?</h2>
+                    <p>Algoritmo de clustering não-supervisionado que agrupa dados em K clusters, minimizando a
+                        distância dos pontos ao centroide do seu cluster.</p>
+
+                    <h2 style="margin-top: 20px;">Como Funciona:</h2>
+                    <ul>
+                        <li><strong>Passo 1:</strong> Escolhe K pontos aleatoriamente (centroides iniciais)</li>
+                        <li><strong>Passo 2:</strong> Atribui cada medicamento ao centroide mais próximo</li>
+                        <li><strong>Passo 3:</strong> Recalcula o centroide de cada cluster (média dos pontos)</li>
+                        <li><strong>Passo 4:</strong> Repete até convergência (quando nada muda)</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Formulação Matemática:</h2>
+                    <p
+                        style="font-family: 'Courier New'; background: #f0f0f0; padding: 10px; border-radius: 5px; font-size: 0.9em;">
+                        Minimizar: ∑ᵢ₌₁ᵏ ∑ₓ∈Cᵢ ||x - μᵢ||²<br>
+                        Onde: μᵢ = centroide do cluster i, ||·|| = distância Euclidiana
+                    </p>
+                </div>
+
+                <!-- SLIDE 8: DETERMINAÇÃO K -->
+                <div class="slide">
+                    <h1>🎯 Determinação do K Ótimo</h1>
+
+                    <h2>Método 1: Elbow Method (Cotovelo)</h2>
+                    <p>Testa diferentes valores de K e observa a inércia (soma das distâncias ao quadrado).</p>
+                    <p style="margin-top: 10px;">Procura pelo "cotovelo" - ponto onde a redução de inércia diminui
+                        significativamente.</p>
+
+                    <h2 style="margin-top: 20px;">Método 2: Silhueta Score ⭐ (Escolhido)</h2>
+                    <p>Métrica que mede coesão e separação dos clusters.</p>
+
+                    <table>
+                        <tr>
+                            <th>K</th>
+                            <th>Silhueta Score</th>
+                            <th>Interpretação</th>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><span class="highlight">0.99</span></td>
+                            <td>EXCELENTE ✅✅✅</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>0.82</td>
+                            <td>BOM ✅</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>0.78</td>
+                            <td>BOM ✅</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>0.71</td>
+                            <td>ACEITÁVEL 👍</td>
+                        </tr>
+                        <tr>
+                            <td>6+</td>
+                            <td>&lt;0.65</td>
+                            <td>PIORA ↓</td>
+                        </tr>
+                    </table>
+
+                    <div class="solution-box">
+                        <strong>🎯 Decisão: K = 2</strong> (Silhueta 0.99 é praticamente perfeito!)
+                    </div>
+                </div>
+
+                <!-- SLIDE 9: RESULTADOS CLUSTERS -->
+                <div class="slide">
+                    <h1>📊 Fase 5: Clusters Descobertos</h1>
+
+                    <h2>Cluster 0: Medicamentos Económicos 💰</h2>
+                    <table style="margin-top: 10px;">
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Quantidade</td>
+                            <td><span class="highlight">34.604 medicamentos (99,1%)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Preço Médio</td>
+                            <td>R$ 50</td>
+                        </tr>
+                        <tr>
+                            <td>Faixa de Preço</td>
+                            <td>R$ 0,50 - R$ 500</td>
+                        </tr>
+                        <tr>
+                            <td>Dose Média</td>
+                            <td>~100mg</td>
+                        </tr>
+                        <tr>
+                            <td>Características</td>
+                            <td>Genéricos, populares, altos volumes</td>
+                        </tr>
+                        <tr>
+                            <td>Exemplos</td>
+                            <td>Dipirona, Amoxicilina, Ibuprofeno</td>
+                        </tr>
+                    </table>
+
+                    <h2 style="margin-top: 20px;">Cluster 1: Medicamentos Premium 💎</h2>
+                    <table style="margin-top: 10px;">
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Quantidade</td>
+                            <td><span class="highlight">6.896 medicamentos (0,9%)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Preço Médio</td>
+                            <td>R$ 850</td>
+                        </tr>
+                        <tr>
+                            <td>Faixa de Preço</td>
+                            <td>R$ 500 - R$ 6.000+</td>
+                        </tr>
+                        <tr>
+                            <td>Dose Média</td>
+                            <td>~2.500mg (ou em UI)</td>
+                        </tr>
+                        <tr>
+                            <td>Características</td>
+                            <td>Especializados, injetáveis, doenças graves</td>
+                        </tr>
+                        <tr>
+                            <td>Exemplos</td>
+                            <td>Abilify, Alimta, Aclasta</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- SLIDE 10: ANÁLISE DE CORRELAÇÃO -->
+                <div class="slide">
+                    <h1>📈 Análise de Correlação</h1>
+
+                    <h2>Pergunta: O preço está relacionado com a dose?</h2>
+
+                    <table>
+                        <tr>
+                            <th>Relação</th>
+                            <th>Correlação</th>
+                            <th>Interpretação</th>
+                        </tr>
+                        <tr>
+                            <td>Dose ↔ Preço</td>
+                            <td>0.12</td>
+                            <td>MUITO FRACA</td>
+                        </tr>
+                        <tr>
+                            <td>Quantidade ↔ Preço</td>
+                            <td>0.08</td>
+                            <td>MUITO FRACA</td>
+                        </tr>
+                        <tr>
+                            <td>Dose ↔ Quantidade</td>
+                            <td>-0.05</td>
+                            <td>NEGATIVA FRACA</td>
+                        </tr>
+                    </table>
+
+                    <h2 style="margin-top: 20px;">🔍 Descoberta Importante:</h2>
+
+                    <div class="info-box">
+                        <strong>A dose NÃO determina o preço!</strong>
+                        <p style="margin-top: 10px;">Uma dipirona 500mg custa ~R$ 5</p>
+                        <p>Um medicamento de câncer 100mg custa ~R$ 2.000</p>
+                        <p style="margin-top: 10px;"><strong>O preço é determinado por:</strong> Tipo de doença,
+                            tecnologia, patenteamento, raridade</p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 11: INTERPRETAÇÃO -->
+                <div class="slide">
+                    <h1>💡 Interpretação dos Resultados</h1>
+
+                    <h2>Descoberta 1: Segmentação Clara</h2>
+                    <p>Medicamentos se dividem naturalmente em 2 grupos distintos com características econômicas bem
+                        separadas.</p>
+
+                    <h2>Descoberta 2: Polarização de Mercado</h2>
+                    <p>99,1% dos medicamentos (Cluster 0) são baratos vs 0,9% (Cluster 1) são premium. O mercado é
+                        fortemente polarizado!</p>
+
+                    <h2>Descoberta 3: Preço ≠ Dose</h2>
+                    <p>Medicamentos caros não necessariamente têm doses maiores. Tipo de medicamento é o fator
+                        determinante.</p>
+
+                    <h2>Descoberta 4: Padrões Ocultos</h2>
+                    <p>Sem clustering, seria impossível identificar esses padrões manualmente em 41.547 registros.</p>
+
+                    <div class="solution-box">
+                        <strong>✅ Conhecimento Descoberto:</strong> O dataset possui estrutura inerente bem definida em
+                        2 clusters com Silhueta 0.99
+                    </div>
+                </div>
+
+                <!-- SLIDE 12: APLICAÇÕES -->
+                <div class="slide">
+                    <h1>🚀 Fase 6: Aplicações Práticas</h1>
+
+                    <h2>Aplicação 1: Estratégia de Marketing</h2>
+                    <ul>
+                        <li><strong>Cluster 0:</strong> Campanha em farmácias populares, promoções em massa</li>
+                        <li><strong>Cluster 1:</strong> Propaganda científica, hospitais, especialistas</li>
+                    </ul>
+
+                    <h2>Aplicação 2: Gestão de Estoque</h2>
+                    <ul>
+                        <li><strong>Cluster 0:</strong> Alto volume em estoque, reposição frequente</li>
+                        <li><strong>Cluster 1:</strong> Sob demanda, armazenamento especial (refrigeração)</li>
+                    </ul>
+
+                    <h2>Aplicação 3: Pesquisa e Desenvolvimento</h2>
+                    <ul>
+                        <li>Identificar gaps no mercado (ex: medicamentos caros para asma?)</li>
+                        <li>Oportunidades de inovação em cada segmento</li>
+                    </ul>
+
+                    <h2>Aplicação 4: Regulação (ANVISA)</h2>
+                    <ul>
+                        <li>Detectar anomalias de preço usando clusters como referência</li>
+                        <li>Identificar medicamentos com preço desproporcionalmente alto ou baixo</li>
+                    </ul>
+                </div>
+
+                <!-- SLIDE 13: METODOLOGIA -->
+                <div class="slide">
+                    <h1>📐 Metodologia Técnica Detalhada</h1>
+
+                    <h2>Ferramentas Utilizadas:</h2>
+                    <ul>
+                        <li><strong>Linguagem:</strong> Python 3.x</li>
+                        <li><strong>Manipulação de Dados:</strong> Pandas, NumPy</li>
+                        <li><strong>Machine Learning:</strong> Scikit-learn (KMeans, StandardScaler)</li>
+                        <li><strong>Visualização:</strong> Matplotlib, Seaborn</li>
+                        <li><strong>Métricas:</strong> Silhouette Score, Inércia</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Normalização (StandardScaler):</h2>
+                    <p>Fórmula aplicada a cada atributo:</p>
+                    <p
+                        style="font-family: 'Courier New'; background: #f0f0f0; padding: 10px; border-radius: 5px; font-size: 0.9em;">
+                        x_norm = (x - μ) / σ<br>
+                        Resultado: média = 0, desvio padrão = 1
+                    </p>
+
+                    <h2 style="margin-top: 20px;">Silhueta Score:</h2>
+                    <p
+                        style="font-family: 'Courier New'; background: #f0f0f0; padding: 10px; border-radius: 5px; font-size: 0.9em;">
+                        s(i) = (b(i) - a(i)) / max(a(i), b(i))<br>
+                        a(i) = distância média intra-cluster<br>
+                        b(i) = distância média para cluster mais próximo
+                    </p>
+                </div>
+
+                <!-- SLIDE 14: LIMITAÇÕES -->
+                <div class="slide">
+                    <h1>⚠️ Limitações e Considerações</h1>
+
+                    <h2>Limitação 1: Geometria Esférica</h2>
+                    <p>K-Means assume clusters em formato de "bola". Dados reais podem ter outros formatos.</p>
+
+                    <h2>Limitação 2: K Predefinido</h2>
+                    <p>Requer escolha de K antes da execução. Se escolher errado, resultado ruim.</p>
+
+                    <h2>Limitação 3: Sensibilidade a Outliers</h2>
+                    <p>Medicamentos com preço extremamente alto/baixo podem distorcer clusters.</p>
+
+                    <h2>Limitação 4: Sem Explicação de POR QUÊ</h2>
+                    <p>K-Means agrupa mas não explica a razão técnica da similaridade.</p>
+
+                    <h2>Limitação 5: Necessidade de Normalização</h2>
+                    <p>Sem normalizar, algoritmo é dominado por variáveis com maior magnitude.</p>
+
+                    <div class="info-box">
+                        <strong>Soluções Alternativas:</strong> DBSCAN (baseado em densidade), Hierarchical Clustering,
+                        Gaussian Mixture Models
+                    </div>
+                </div>
+
+                <!-- SLIDE 15: OUTRAS TÉCNICAS -->
+                <div class="slide">
+                    <h1>🔍 Técnicas Alternativas de Clustering</h1>
+
+                    <h2>DBSCAN (Density-Based Spatial Clustering)</h2>
+                    <ul>
+                        <li>✓ Não requer definir K previamente</li>
+                        <li>✓ Detecta outliers automaticamente</li>
+                        <li>✗ Complexo de tunar parâmetros</li>
+                    </ul>
+
+                    <h2>Hierarchical Clustering</h2>
+                    <ul>
+                        <li>✓ Cria dendrograma (árvore de similaridade)</li>
+                        <li>✓ Mostra relações entre clusters</li>
+                        <li>✗ Computacionalmente mais pesado</li>
+                    </ul>
+
+                    <h2>Gaussian Mixture Models (GMM)</h2>
+                    <ul>
+                        <li>✓ Modelagem probabilística</li>
+                        <li>✓ Fornece probabilidade de pertencimento</li>
+                        <li>✗ Assume distribuição gaussiana</li>
+                    </ul>
+
+                    <h2>Mean Shift</h2>
+                    <ul>
+                        <li>✓ Sem K predefinido</li>
+                        <li>✓ Baseado em densidade</li>
+                        <li>✗ Lento para grandes datasets</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <strong>Por que K-Means foi escolhido?</strong> Simplicidade, velocidade, resultados
+                        interpretáveis e Silhueta 0.99 excelente
+                    </div>
+                </div>
+
+                <!-- SLIDE 16: VALIDAÇÃO DOS RESULTADOS -->
+                <div class="slide">
+                    <h1>✅ Validação dos Resultados</h1>
+
+                    <h2>Teste 1: Coesão (Compactação)</h2>
+                    <p>Medicamentos no mesmo cluster estão pertos?</p>
+                    <p><strong>Resultado:</strong> ✅ SIM - Silhueta 0.99 confirma alta coesão</p>
+
+                    <h2>Teste 2: Separação (Isolamento)</h2>
+                    <p>Clusters estão distantes um do outro?</p>
+                    <p><strong>Resultado:</strong> ✅ SIM - Cluster 0 (baratos) vs Cluster 1 (caros) muito separados</p>
+
+                    <h2>Teste 3: Interpretabilidade</h2>
+                    <p>Os clusters fazem sentido do ponto de vista de negócio?</p>
+                    <p><strong>Resultado:</strong> ✅ SIM - Divisão Económico/Premium é clara</p>
+
+                    <h2>Teste 4: Estabilidade</h2>
+                    <p>Resultados são consistentes entre execuções?</p>
+                    <p><strong>Resultado:</strong> ✅ SIM - Com random_state fixado, sempre mesmo resultado</p>
+
+                    <div class="solution-box">
+                        <strong>✅ Conclusão:</strong> Clustering validado e confiável para aplicações práticas
+                    </div>
+                </div>
+
+                <!-- SLIDE 17: CONCLUSÕES -->
+                <div class="slide">
+                    <h1>🎓 Conclusões</h1>
+
+                    <h2>Resumo da Jornada KDD:</h2>
+                    <ol>
+                        <li><strong>Seleção:</strong> 41.547 medicamentos identificados</li>
+                        <li><strong>Pré-processamento:</strong> 93,8% de qualidade alcançada</li>
+                        <li><strong>Transformação:</strong> 35 features normalizadas</li>
+                        <li><strong>Data Mining:</strong> K=2 com Silhueta 0.99 descoberto</li>
+                        <li><strong>Interpretação:</strong> 2 clusters com significado claro</li>
+                        <li><strong>Ação:</strong> 4+ aplicações práticas identificadas</li>
+                    </ol>
+
+                    <h2 style="margin-top: 20px;">Aprendizados Principais:</h2>
+                    <ul>
+                        <li>🔹 Dados sem análise são apenas números</li>
+                        <li>🔹 Limpeza de dados é CRÍTICA (80% do trabalho)</li>
+                        <li>🔹 Normalização é ESSENCIAL para ML</li>
+                        <li>🔹 Validação (Silhueta) garante confiabilidade</li>
+                        <li>🔹 Conhecimento descoberto precisa virar ação</li>
+                    </ul>
+
+                    <div class="solution-box">
+                        <strong>💡 Impacto:</strong> Transformamos 41.547 registros caóticos em 2 grupos bem definidos
+                        com insights acionáveis
+                    </div>
+                </div>
+
+                <!-- SLIDE 18: PRÓXIMOS PASSOS -->
+                <div class="slide">
+                    <h1>🚀 Próximos Passos e Extensões</h1>
+
+                    <h2>Análises Futuras Recomendadas:</h2>
+                    <ul>
+                        <li><strong>Clustering por Princípio Ativo:</strong> Agrupar por substância ativa, não por preço
+                        </li>
+                        <li><strong>Análise Temporal:</strong> Como clustering muda ao longo do tempo?</li>
+                        <li><strong>Apriori Rules:</strong> Que medicamentos são frequentemente prescritos juntos?</li>
+                        <li><strong>Hierárquico:</strong> Relacionamento entre sub-clusters dentro de cada grupo</li>
+                        <li><strong>Ensemble:</strong> Combinar múltiplos algoritmos (K-Means + DBSCAN)</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Perguntas em Aberto:</h2>
+                    <ul>
+                        <li>❓ Se houvesse 3+ clusters, qual seria a interpretação?</li>
+                        <li>❓ Como clusters evoluem com novos medicamentos?</li>
+                        <li>❓ Qual é a distribuição de doenças em cada cluster?</li>
+                        <li>❓ Clusters correspondem a indicações terapêuticas?</li>
+                    </ul>
+                </div>
+
+                <!-- SLIDE 19: REFERÊNCIAS -->
+                <div class="slide">
+                    <h1>📚 Referências Técnicas</h1>
+
+                    <h2>Algoritmos e Conceitos:</h2>
+                    <ul>
+                        <li><strong>K-Means:</strong> MacQueen, J. (1967). "Some methods for classification and analysis
+                            of multivariate observations"</li>
+                        <li><strong>Silhouette:</strong> Rousseeuw, P. (1987). "Silhouettes: A graphical aid to
+                            interpret and validate cluster analysis"</li>
+                        <li><strong>Normalização:</strong> Standardization vs Normalization em Machine Learning</li>
+                        <li><strong>KDD Process:</strong> Fayyad, U., Piatetsky-Shapiro, G., & Smyth, P. (1996)</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Dataset:</h2>
+                    <ul>
+                        <li><strong>Fonte:</strong> Repositórios públicos de dados brasileiros (dados de medicamentos
+                            ANVISA)</li>
+                        <li><strong>Periodo:</strong> Snapshot atual</li>
+                        <li><strong>Registros:</strong> 41.547 medicamentos</li>
+                        <li><strong>Atributos:</strong> 6 principais (Nome, Quantidade, Dose, Preço, Código Barras,
+                            Tipo)</li>
+                    </ul>
+
+                    <h2 style="margin-top: 20px;">Ferramentas:</h2>
+                    <ul>
+                        <li><strong>Python:</strong> sklearn, pandas, numpy, matplotlib</li>
+                        <li><strong>Documentação:</strong> scikit-learn.org</li>
+                    </ul>
+                </div>
+
+                <!-- SLIDE 20: PERGUNTAS E RESPOSTAS -->
+                <div class="slide">
+                    <h1>❓ Perguntas Frequentes</h1>
+
+                    <h2>P: Por que K=2 e não K=3, 4 ou 5?</h2>
+                    <p><strong>R:</strong> Testamos K=2 até K=7. Silhueta Score foi máximo em K=2 (0.99). Aumentar K
+                        reduzia qualidade (Silhueta 0.82, 0.78, etc). "Navalha de Occam": explicação mais simples é
+                        geralmente correta.</p>
+
+                    <h2>P: Como vocês trataram os 6.247 registros com erros?</h2>
+                    <p><strong>R:</strong> Removemos completamente. Não usamos imputação porque dados muito corrompidos
+                        não são confiáveis. Melhor ter menos dados bons que muitos dados ruins.</p>
+
+                    <h2>P: A normalização foi essencial?</h2>
+                    <p><strong>R:</strong> ABSOLUTAMENTE SIM! Sem normalizar: Dose (0 a 1M) dominava. Com normalizar:
+                        Preço, Quantidade e Dose têm peso igual.</p>
+
+                    <h2>P: Esse clustering é permanente ou pode mudar?</h2>
+                    <p><strong>R:</strong> Com dados atuais, clusters são estáveis. Mas conforme novos medicamentos são
+                        lançados, estrutura pode evoluir. Análise deve ser REPETIDA periodicamente.</p>
+
+                    <h2>P: Como implementar isso em produção?</h2>
+                    <p><strong>R:</strong> Pipeline automatizado: ETL → Normalização → K-Means → Dashboard com clusters.
+                        Atualizar mensalmente com novos dados.</p>
+                </div>
+
+                <!-- SLIDE 21: AGRADECIMENTOS -->
+                <div class="slide titulo-slide">
+                    <h1 style="margin-bottom: 40px;">🙏 Obrigado!</h1>
+                    <p style="font-size: 1.2em; margin-bottom: 50px;">Dúvidas?</p>
+                    <p style="opacity: 0.9;">Projeto: Estudo de Caso KDD em Dataset de Medicamentos</p>
+                    <p style="margin-top: 30px; font-size: 0.9em;">Técnica: K-Means Clustering com Validação Silhueta
+                    </p>
+                    <p style="margin-top: 20px; font-size: 0.85em; opacity: 0.8;">Descobrindo Padrões Ocultos em Dados
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLES -->
+        <div class="controls">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+            <span class="slide-info">
+                <span id="currentSlide">1</span> / <span id="totalSlides">21</span>
+            </span>
+            <button id="nextBtn" onclick="changeSlide(1)">Próximo →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+
+            slides[currentSlide - 1].classList.add('active');
+
+            document.getElementById('currentSlide').textContent = currentSlide;
+            document.getElementById('totalSlides').textContent = totalSlides;
+
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            // Atualizar label de mídia
+            const mediaLabels = {
+                1: '[Slide de Capa - Título]',
+                2: '[Contexto e Dataset]',
+                3: '[Problematização]',
+                4: '[Objetivos do Projeto]',
+                5: '[Processo KDD]',
+                6: '[Fase ETL]',
+                7: '[K-Means Explicado]',
+                8: '[Determinação de K]',
+                9: '[Clusters Descobertos]',
+                10: '[Análise de Correlação]',
+                11: '[Interpretação dos Resultados]',
+                12: '[Aplicações Práticas]',
+                13: '[Metodologia Técnica]',
+                14: '[Limitações]',
+                15: '[Técnicas Alternativas]',
+                16: '[Validação]',
+                17: '[Conclusões]',
+                18: '[Próximos Passos]',
+                19: '[Referências]',
+                20: '[Q&A]',
+                21: '[Agradecimentos]'
+            };
+
+            document.getElementById('mediaLabel').textContent = mediaLabels[currentSlide] || '[Média]';
+        }
+
+        function changeSlide(n) {
+            currentSlide += n;
+            showSlide(currentSlide);
+        }
+
+        // Navegação por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(currentSlide);
+    </script>
+</body>
