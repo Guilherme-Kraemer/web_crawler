@@ -1,3 +1,8 @@
 /home
 .vscode
 __pycache__
+.pytest_cache
+medications_by_letter
+*.png
+*.html
+*.pdf
